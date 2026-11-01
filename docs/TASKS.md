@@ -7,13 +7,12 @@ Dependency rule: `infrastructure -> application -> domain`. Never the reverse.
 ## Done
 - [x] Setup: Spring Initializr skeleton and hexagonal package layout
 - [x] Task 1 (15 pts): Hello-world application with `CommandLineRunner`
-
 - [x] Task 2 (20 pts): Customer CRUD REST API (Spring Data JPA, H2, paginated list)
-
 - [x] Task 3 (20 pts): OAuth2 resource server with JWT, USER/ADMIN roles
+- [x] Task 4 (10 pts): Spring profiles local/dev/stg/prod with per-environment DB config
 
 ## Next
-- [ ] Task 4: (waiting for the description)
+- [ ] Task 5: (waiting for the description)
 
 ## Notes
 - Initializr returns `4.1.2.RELEASE`, which does not exist on Central. The correct version is `4.1.2`.

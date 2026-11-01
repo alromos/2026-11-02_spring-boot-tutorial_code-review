@@ -1,0 +1,10 @@
+# Settings shared by every environment.
+# Environment-specific settings live in application-{profile}.yml.
+spring:
+  application:
+    name: tutorial
+  profiles:
+    # Used when no profile is set (spring.profiles.active / SPRING_PROFILES_ACTIVE).
+    default: local
+  jpa:
+    open-in-view: false
