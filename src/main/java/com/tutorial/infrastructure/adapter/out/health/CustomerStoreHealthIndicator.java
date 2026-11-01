@@ -1,7 +1,6 @@
 package com.tutorial.infrastructure.adapter.out.health;
 
 import com.tutorial.application.port.in.GetCustomerUseCase;
-import com.tutorial.domain.PageQuery;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -22,7 +21,7 @@ class CustomerStoreHealthIndicator implements HealthIndicator {
     @Override
     public Health health() {
         try {
-            long total = customers.getAll(new PageQuery(0, 1)).totalElements();
+            long total = customers.count();
             return Health.up().withDetail("customers", total).build();
         } catch (Exception ex) {
             return Health.down(ex).build();

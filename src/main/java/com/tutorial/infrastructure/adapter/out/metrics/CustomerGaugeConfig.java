@@ -1,7 +1,6 @@
 package com.tutorial.infrastructure.adapter.out.metrics;
 
 import com.tutorial.application.port.in.GetCustomerUseCase;
-import com.tutorial.domain.PageQuery;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import org.springframework.beans.factory.ObjectProvider;
@@ -16,7 +15,7 @@ class CustomerGaugeConfig {
     MeterBinder customerCountGauge(ObjectProvider<GetCustomerUseCase> customers) {
         // ObjectProvider: the use case is looked up lazily, which avoids a startup dependency cycle.
         return registry -> Gauge
-                .builder("customers.count", () -> customers.getObject().getAll(new PageQuery(0, 1)).totalElements())
+                .builder("customers.count", () -> customers.getObject().count())
                 .description("Current number of customers")
                 .register(registry);
     }
