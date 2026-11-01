@@ -17,3 +17,10 @@ spring:
 logging:
   level:
     com.tutorial: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Smaller surface in production.
+        include: health,prometheus

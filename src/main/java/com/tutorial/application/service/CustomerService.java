@@ -4,6 +4,7 @@ import com.tutorial.application.port.in.CreateCustomerUseCase;
 import com.tutorial.application.port.in.DeleteCustomerUseCase;
 import com.tutorial.application.port.in.GetCustomerUseCase;
 import com.tutorial.application.port.in.UpdateCustomerUseCase;
+import com.tutorial.application.port.out.CustomerMetricsPort;
 import com.tutorial.application.port.out.CustomerRepositoryPort;
 import com.tutorial.domain.Customer;
 import com.tutorial.domain.CustomerNotFoundException;
@@ -19,14 +20,18 @@ public class CustomerService implements CreateCustomerUseCase, GetCustomerUseCas
         UpdateCustomerUseCase, DeleteCustomerUseCase {
 
     private final CustomerRepositoryPort repository;
+    private final CustomerMetricsPort metrics;
 
-    public CustomerService(CustomerRepositoryPort repository) {
+    public CustomerService(CustomerRepositoryPort repository, CustomerMetricsPort metrics) {
         this.repository = repository;
+        this.metrics = metrics;
     }
 
     @Override
     public Customer create(String name, String email) {
-        return repository.save(new Customer(null, name, email));
+        Customer saved = repository.save(new Customer(null, name, email));
+        metrics.customerCreated();
+        return saved;
     }
 
     @Override
@@ -46,7 +51,9 @@ public class CustomerService implements CreateCustomerUseCase, GetCustomerUseCas
         if (!repository.existsById(id)) {
             throw new CustomerNotFoundException(id);
         }
-        return repository.save(new Customer(id, name, email));
+        Customer saved = repository.save(new Customer(id, name, email));
+        metrics.customerUpdated();
+        return saved;
     }
 
     @Override
@@ -55,5 +62,6 @@ public class CustomerService implements CreateCustomerUseCase, GetCustomerUseCas
             throw new CustomerNotFoundException(id);
         }
         repository.deleteById(id);
+        metrics.customerDeleted();
     }
 }

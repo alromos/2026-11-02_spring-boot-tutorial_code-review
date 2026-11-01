@@ -11,9 +11,10 @@ Dependency rule: `infrastructure -> application -> domain`. Never the reverse.
 - [x] Task 3 (20 pts): OAuth2 resource server with JWT, USER/ADMIN roles
 - [x] Task 4 (10 pts): Spring profiles local/dev/stg/prod with per-environment DB config
 - [x] Task 5 (10 pts, optional): Flyway migrations, run automatically at startup
+- [x] Task 6 (15 pts): Actuator, custom health indicator, Prometheus metrics
 
 ## Next
-- [ ] Task 6: (waiting for the description)
+- [ ] Task 7: (waiting for the description)
 
 ## Notes
 - Initializr returns `4.1.2.RELEASE`, which does not exist on Central. The correct version is `4.1.2`.

@@ -12,3 +12,19 @@ spring:
     # Runs the scripts in db/migration automatically on startup.
     enabled: true
     locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      # Details (db, customerStore, disk space) only for ADMIN; everyone else sees just the status.
+      show-details: when-authorized
+      roles: ADMIN
+
+info:
+  app:
+    name: Spring Boot Tutorial
+    description: Customer CRUD with security, profiles, Flyway and Actuator
