@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,8 +26,16 @@ class CustomerControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private String admin;
+
+    @BeforeEach
+    void login() throws Exception {
+        admin = TestTokens.bearer(mockMvc, "admin", "admin123");
+    }
+
     private String createCustomer(String name, String email) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/customers")
+                        .header("Authorization", admin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON.formatted(name, email)))
                 .andExpect(status().isCreated())
@@ -40,22 +49,23 @@ class CustomerControllerTest {
     void fullCrudCycle() throws Exception {
         String location = createCustomer("Ann", "ann@example.com");
 
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).header("Authorization", admin))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("ann@example.com"));
 
         mockMvc.perform(put(location)
+                        .header("Authorization", admin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON.formatted("Anna", "anna@example.com")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Anna"));
 
-        mockMvc.perform(get("/api/customers"))
+        mockMvc.perform(get("/api/customers").header("Authorization", admin))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[?(@.name=='Anna')]").exists());
 
-        mockMvc.perform(delete(location)).andExpect(status().isNoContent());
-        mockMvc.perform(get(location)).andExpect(status().isNotFound());
+        mockMvc.perform(delete(location).header("Authorization", admin)).andExpect(status().isNoContent());
+        mockMvc.perform(get(location).header("Authorization", admin)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -64,7 +74,7 @@ class CustomerControllerTest {
             createCustomer("Paged" + i, "paged" + i + "@example.com");
         }
 
-        mockMvc.perform(get("/api/customers").param("page", "0").param("size", "2"))
+        mockMvc.perform(get("/api/customers").header("Authorization", admin).param("page", "0").param("size", "2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
                 .andExpect(jsonPath("$.size").value(2))
@@ -74,14 +84,15 @@ class CustomerControllerTest {
 
     @Test
     void invalidPagingParametersReturn400() throws Exception {
-        mockMvc.perform(get("/api/customers").param("size", "0")).andExpect(status().isBadRequest());
-        mockMvc.perform(get("/api/customers").param("size", "101")).andExpect(status().isBadRequest());
-        mockMvc.perform(get("/api/customers").param("page", "-1")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/customers").header("Authorization", admin).param("size", "0")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/customers").header("Authorization", admin).param("size", "101")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/customers").header("Authorization", admin).param("page", "-1")).andExpect(status().isBadRequest());
     }
 
     @Test
     void invalidRequestReturns400() throws Exception {
         mockMvc.perform(post("/api/customers")
+                        .header("Authorization", admin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON.formatted("", "not-an-email")))
                 .andExpect(status().isBadRequest());
@@ -89,7 +100,7 @@ class CustomerControllerTest {
 
     @Test
     void unknownIdReturns404() throws Exception {
-        mockMvc.perform(get("/api/customers/999999")).andExpect(status().isNotFound());
-        mockMvc.perform(delete("/api/customers/999999")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/customers/999999").header("Authorization", admin)).andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/customers/999999").header("Authorization", admin)).andExpect(status().isNotFound());
     }
 }
