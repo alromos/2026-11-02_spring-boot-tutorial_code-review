@@ -105,4 +105,35 @@ class CustomerApiIntegrationTest {
         mockMvc.perform(get("/api/customers/999999").header("Authorization", admin)).andExpect(status().isNotFound());
         mockMvc.perform(delete("/api/customers/999999").header("Authorization", admin)).andExpect(status().isNotFound());
     }
+
+    @Test
+    void duplicateEmailReturns409() throws Exception {
+        createCustomer("Ann", "dup@example.com");
+
+        mockMvc.perform(post("/api/customers")
+                        .header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JSON.formatted("Other", "DUP@example.com")))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void malformedJsonAndBadIdReturn400() throws Exception {
+        mockMvc.perform(post("/api/customers")
+                        .header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{not json"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/customers/abc").header("Authorization", admin))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void tooLongNameReturns400() throws Exception {
+        mockMvc.perform(post("/api/customers")
+                        .header("Authorization", admin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JSON.formatted("x".repeat(256), "long@example.com")))
+                .andExpect(status().isBadRequest());
+    }
 }
