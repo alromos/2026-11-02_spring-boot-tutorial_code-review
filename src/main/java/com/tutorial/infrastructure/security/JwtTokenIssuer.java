@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenIssuer {
 
+    public static final String ISSUER = "spring-boot-tutorial";
+
     private static final String ROLE_PREFIX = "ROLE_";
 
     private final JwtEncoder encoder;
@@ -39,7 +41,7 @@ public class JwtTokenIssuer {
                 .map(a -> a.substring(ROLE_PREFIX.length()))
                 .toList();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("spring-boot-tutorial")
+                .issuer(ISSUER)
                 .subject(authentication.getName())
                 .issuedAt(now)
                 .expiresAt(now.plus(ttl))
