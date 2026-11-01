@@ -33,7 +33,7 @@ class ProfileConfigTest {
             assertThat(env.getActiveProfiles()).isEmpty();
             assertThat(env.getDefaultProfiles()).contains("local");
             assertThat(env.getProperty("spring.datasource.url")).isEqualTo("jdbc:h2:mem:tutorial");
-            assertThat(env.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("create-drop");
+            assertThat(env.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
         }
     }
 
@@ -42,7 +42,7 @@ class ProfileConfigTest {
         try (ConfigurableApplicationContext ctx = start("--spring.profiles.active=dev")) {
             Environment env = ctx.getEnvironment();
             assertThat(env.getProperty("spring.datasource.url")).isEqualTo("jdbc:h2:file:./data/tutorial-dev");
-            assertThat(env.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
+            assertThat(env.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
         }
     }
 
@@ -53,7 +53,7 @@ class ProfileConfigTest {
             Environment env = ctx.getEnvironment();
             assertThat(env.getProperty("spring.datasource.url")).isEqualTo("jdbc:postgresql://stg-host:5432/app");
             assertThat(env.getProperty("spring.datasource.username")).isEqualTo("stg_user");
-            assertThat(env.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
+            assertThat(env.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
         }
     }
 

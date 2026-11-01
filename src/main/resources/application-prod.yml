@@ -1,7 +1,6 @@
 # Production: PostgreSQL. Connection details come from environment variables.
 # No defaults on purpose: the app fails fast if one is missing.
-# ddl-auto=validate never changes the schema. In a real system the schema
-# is created by a migration tool (e.g. Flyway), which is not part of this task.
+# The schema is managed by Flyway (db/migration). Hibernate only validates it.
 spring:
   datasource:
     url: ${DB_URL}

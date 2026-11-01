@@ -10,9 +10,10 @@ Dependency rule: `infrastructure -> application -> domain`. Never the reverse.
 - [x] Task 2 (20 pts): Customer CRUD REST API (Spring Data JPA, H2, paginated list)
 - [x] Task 3 (20 pts): OAuth2 resource server with JWT, USER/ADMIN roles
 - [x] Task 4 (10 pts): Spring profiles local/dev/stg/prod with per-environment DB config
+- [x] Task 5 (10 pts, optional): Flyway migrations, run automatically at startup
 
 ## Next
-- [ ] Task 5: (waiting for the description)
+- [ ] Task 6: (waiting for the description)
 
 ## Notes
 - Initializr returns `4.1.2.RELEASE`, which does not exist on Central. The correct version is `4.1.2`.
