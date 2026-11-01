@@ -13,7 +13,17 @@ public interface CustomerRepositoryPort {
 
     PageResult<Customer> findAll(PageQuery query);
 
+    /** Updates an existing customer. Empty if no customer with that id exists (it is never re-created). */
+    Optional<Customer> update(Customer customer);
+
     boolean existsById(Long id);
 
-    void deleteById(Long id);
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailAndIdNot(String email, Long id);
+
+    long count();
+
+    /** @return true if a customer was deleted, false if none existed */
+    boolean deleteById(Long id);
 }

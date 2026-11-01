@@ -90,4 +90,27 @@ class CustomerPersistenceAdapterTest {
         assertThat(result.content()).isEmpty();
         assertThat(result.totalElements()).isEqualTo(1);
     }
+
+    @Test
+    void updateOfMissingCustomerReturnsEmptyAndCreatesNothing() {
+        assertThat(adapter.update(new Customer(12345L, "Ghost", "ghost@example.com"))).isEmpty();
+        assertThat(adapter.count()).isZero();
+    }
+
+    @Test
+    void deleteReportsWhetherARowWasRemoved() {
+        Customer saved = adapter.save(new Customer(null, "Ann", "ann@example.com"));
+
+        assertThat(adapter.deleteById(saved.id())).isTrue();
+        assertThat(adapter.deleteById(saved.id())).isFalse();
+    }
+
+    @Test
+    void emailLookupsIgnoreTheCustomerItself() {
+        Customer saved = adapter.save(new Customer(null, "Ann", "ann@example.com"));
+
+        assertThat(adapter.existsByEmail("ann@example.com")).isTrue();
+        assertThat(adapter.existsByEmailAndIdNot("ann@example.com", saved.id())).isFalse();
+        assertThat(adapter.existsByEmailAndIdNot("ann@example.com", saved.id() + 1)).isTrue();
+    }
 }

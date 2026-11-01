@@ -8,4 +8,6 @@ public interface GetCustomerUseCase {
     Customer getById(Long id);
 
     PageResult<Customer> getAll(PageQuery query);
+
+    long count();
 }

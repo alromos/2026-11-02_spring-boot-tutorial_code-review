@@ -17,10 +17,10 @@ class CustomerJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255, unique = true)
     private String email;
 
     protected CustomerJpaEntity() {
@@ -35,6 +35,11 @@ class CustomerJpaEntity {
 
     static CustomerJpaEntity fromDomain(Customer customer) {
         return new CustomerJpaEntity(customer.id(), customer.name(), customer.email());
+    }
+
+    void apply(Customer customer) {
+        this.name = customer.name();
+        this.email = customer.email();
     }
 
     Customer toDomain() {

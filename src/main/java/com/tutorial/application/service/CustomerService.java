@@ -8,8 +8,10 @@ import com.tutorial.application.port.out.CustomerMetricsPort;
 import com.tutorial.application.port.out.CustomerRepositoryPort;
 import com.tutorial.domain.Customer;
 import com.tutorial.domain.CustomerNotFoundException;
+import com.tutorial.domain.DuplicateEmailException;
 import com.tutorial.domain.PageQuery;
 import com.tutorial.domain.PageResult;
+import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +31,11 @@ public class CustomerService implements CreateCustomerUseCase, GetCustomerUseCas
 
     @Override
     public Customer create(String name, String email) {
-        Customer saved = repository.save(new Customer(null, name, email));
+        String normalized = normalize(email);
+        if (repository.existsByEmail(normalized)) {
+            throw new DuplicateEmailException(normalized);
+        }
+        Customer saved = repository.save(new Customer(null, name, normalized));
         metrics.customerCreated();
         return saved;
     }
@@ -47,21 +53,34 @@ public class CustomerService implements CreateCustomerUseCase, GetCustomerUseCas
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public long count() {
+        return repository.count();
+    }
+
+    @Override
     public Customer update(Long id, String name, String email) {
-        if (!repository.existsById(id)) {
-            throw new CustomerNotFoundException(id);
+        String normalized = normalize(email);
+        if (repository.existsByEmailAndIdNot(normalized, id)) {
+            throw new DuplicateEmailException(normalized);
         }
-        Customer saved = repository.save(new Customer(id, name, email));
+        // update() loads and modifies the existing row, so a customer deleted in the meantime
+        // is reported as not found instead of being silently re-created.
+        Customer saved = repository.update(new Customer(id, name, normalized))
+                .orElseThrow(() -> new CustomerNotFoundException(id));
         metrics.customerUpdated();
         return saved;
     }
 
     @Override
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
+        if (!repository.deleteById(id)) {
             throw new CustomerNotFoundException(id);
         }
-        repository.deleteById(id);
         metrics.customerDeleted();
+    }
+
+    private static String normalize(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 }

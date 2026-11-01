@@ -41,12 +41,40 @@ class CustomerPersistenceAdapter implements CustomerRepositoryPort {
     }
 
     @Override
+    public Optional<Customer> update(Customer customer) {
+        // The entity is managed inside the caller's transaction, so changes are flushed on commit.
+        return jpaRepository.findById(customer.id()).map(entity -> {
+            entity.apply(customer);
+            return entity.toDomain();
+        });
+    }
+
+    @Override
     public boolean existsById(Long id) {
         return jpaRepository.existsById(id);
     }
 
     @Override
-    public void deleteById(Long id) {
+    public boolean existsByEmail(String email) {
+        return jpaRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByEmailAndIdNot(String email, Long id) {
+        return jpaRepository.existsByEmailAndIdNot(email, id);
+    }
+
+    @Override
+    public long count() {
+        return jpaRepository.count();
+    }
+
+    @Override
+    public boolean deleteById(Long id) {
+        if (!jpaRepository.existsById(id)) {
+            return false;
+        }
         jpaRepository.deleteById(id);
+        return true;
     }
 }

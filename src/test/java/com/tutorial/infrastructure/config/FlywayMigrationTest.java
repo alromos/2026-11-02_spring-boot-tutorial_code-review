@@ -21,14 +21,18 @@ class FlywayMigrationTest {
         List<String> versions = jdbc.queryForList(
                 "SELECT \"version\" FROM \"flyway_schema_history\" WHERE \"success\" = TRUE AND \"version\" IS NOT NULL ORDER BY \"installed_rank\"",
                 String.class);
-        assertThat(versions).containsExactly("1", "2");
+        assertThat(versions).containsExactly("1", "2", "3");
     }
 
     @Test
-    void emailIndexFromV2Exists() {
-        Integer count = jdbc.queryForObject(
+    void emailIsUniqueAfterV3() {
+        Integer unique = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.INDEXES WHERE UPPER(INDEX_NAME) = 'UQ_CUSTOMERS_EMAIL'",
+                Integer.class);
+        Integer old = jdbc.queryForObject(
                 "SELECT COUNT(*) FROM INFORMATION_SCHEMA.INDEXES WHERE UPPER(INDEX_NAME) = 'IDX_CUSTOMERS_EMAIL'",
                 Integer.class);
-        assertThat(count).isEqualTo(1);
+        assertThat(unique).isEqualTo(1);
+        assertThat(old).isZero();
     }
 }

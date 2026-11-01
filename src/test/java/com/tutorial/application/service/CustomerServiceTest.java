@@ -12,6 +12,7 @@ import com.tutorial.application.port.out.CustomerMetricsPort;
 import com.tutorial.application.port.out.CustomerRepositoryPort;
 import com.tutorial.domain.Customer;
 import com.tutorial.domain.CustomerNotFoundException;
+import com.tutorial.domain.DuplicateEmailException;
 import com.tutorial.domain.PageQuery;
 import com.tutorial.domain.PageResult;
 import java.util.List;
@@ -73,10 +74,28 @@ class CustomerServiceTest {
     }
 
     @Test
+    void createRejectsDuplicateEmail() {
+        when(repository.existsByEmail("ann@example.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.create("Ann", "Ann@Example.com"))
+                .isInstanceOf(DuplicateEmailException.class);
+
+        verify(repository, never()).save(any());
+        verifyNoInteractions(metrics);
+    }
+
+    @Test
+    void createStoresEmailInLowerCase() {
+        when(repository.save(new Customer(null, "Ann", "ann@example.com")))
+                .thenReturn(new Customer(1L, "Ann", "ann@example.com"));
+
+        assertThat(service.create("Ann", " Ann@Example.COM ").email()).isEqualTo("ann@example.com");
+    }
+
+    @Test
     void updateKeepsIdAndReportsMetric() {
-        when(repository.existsById(1L)).thenReturn(true);
-        when(repository.save(new Customer(1L, "Anna", "anna@example.com")))
-                .thenReturn(new Customer(1L, "Anna", "anna@example.com"));
+        when(repository.update(new Customer(1L, "Anna", "anna@example.com")))
+                .thenReturn(Optional.of(new Customer(1L, "Anna", "anna@example.com")));
 
         Customer updated = service.update(1L, "Anna", "anna@example.com");
 
@@ -85,8 +104,8 @@ class CustomerServiceTest {
     }
 
     @Test
-    void updateThrowsAndDoesNotSaveWhenMissing() {
-        when(repository.existsById(99L)).thenReturn(false);
+    void updateThrowsWhenMissing() {
+        when(repository.update(new Customer(99L, "X", "x@example.com"))).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(99L, "X", "x@example.com"))
                 .isInstanceOf(CustomerNotFoundException.class);
@@ -96,22 +115,31 @@ class CustomerServiceTest {
     }
 
     @Test
+    void updateRejectsEmailOfAnotherCustomer() {
+        when(repository.existsByEmailAndIdNot("taken@example.com", 1L)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.update(1L, "Anna", "taken@example.com"))
+                .isInstanceOf(DuplicateEmailException.class);
+
+        verify(repository, never()).update(any());
+        verifyNoInteractions(metrics);
+    }
+
+    @Test
     void deleteRemovesCustomerAndReportsMetric() {
-        when(repository.existsById(1L)).thenReturn(true);
+        when(repository.deleteById(1L)).thenReturn(true);
 
         service.delete(1L);
 
-        verify(repository).deleteById(1L);
         verify(metrics).customerDeleted();
     }
 
     @Test
     void deleteThrowsAndDeletesNothingWhenMissing() {
-        when(repository.existsById(99L)).thenReturn(false);
+        when(repository.deleteById(99L)).thenReturn(false);
 
         assertThatThrownBy(() -> service.delete(99L)).isInstanceOf(CustomerNotFoundException.class);
 
-        verify(repository, never()).deleteById(any());
         verifyNoInteractions(metrics);
     }
 }
