@@ -1,0 +1,7 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
+  <!--
+    Project-local Maven settings. Intentionally empty: no mirrors or company
+    repositories, so dependencies come straight from Maven Central.
+    Used via .mvn/maven.config instead of ~/.m2/settings.xml.
+  -->
+</settings>
