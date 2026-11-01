@@ -1,0 +1,15 @@
+# Used by tests (@ActiveProfiles("test")). Independent of the local/dev/stg/prod settings.
+spring:
+  datasource:
+    # A uniquely named in-memory H2 per Spring context, so tests never share data by accident.
+    url: jdbc:h2:mem:${random.uuid}
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate   # Flyway builds the schema, exactly as in production
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
