@@ -14,3 +14,9 @@ spring:
 logging:
   level:
     com.tutorial: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus

@@ -12,20 +12,7 @@
 	<artifactId>tutorial</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>tutorial</name>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<description>Spring Boot tutorial: customer CRUD API</description>
 	<properties>
 		<java.version>25</java.version>
 	</properties>
