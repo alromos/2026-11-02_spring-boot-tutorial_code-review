@@ -1,0 +1,26 @@
+# Production: PostgreSQL. Connection details come from environment variables.
+# No defaults on purpose: the app fails fast if one is missing.
+# The schema is managed by Flyway (db/migration). Hibernate only validates it.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+logging:
+  level:
+    com.tutorial: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # Smaller surface in production.
+        include: health,prometheus

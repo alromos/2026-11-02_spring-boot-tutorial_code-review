@@ -1,0 +1,14 @@
+# Local development: throwaway in-memory database, nothing to install.
+spring:
+  datasource:
+    url: jdbc:h2:mem:tutorial
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+logging:
+  level:
+    com.tutorial: DEBUG
